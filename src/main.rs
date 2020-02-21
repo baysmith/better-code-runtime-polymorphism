@@ -9,5 +9,5 @@ fn main() {
     document.push(1);
     document.push(2);
     document.push(3);
-    draw(&document, &mut out, 0).expect("draw document error");
+    document.draw(&mut out, 0).expect("draw document error");
 }
