@@ -15,9 +15,12 @@ impl Draw for Object {
     }
 }
 
-pub type Document = Vec<Object>;
+pub type Document<T> = Vec<T>;
 
-impl Draw for Document {
+impl<T> Draw for Document<T>
+where
+    T: Draw,
+{
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(b"<document>\n")?;
