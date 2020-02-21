@@ -11,6 +11,7 @@ pub struct Object {
 
 impl Object {
     pub fn new(x: i32) -> Self {
+        println!("ctor");
         Object { value: Box::new(x) }
     }
 }
