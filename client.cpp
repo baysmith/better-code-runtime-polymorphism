@@ -1,7 +1,10 @@
-//  clang++ -std=c++11 client.cpp -o client && ./client
+//  clang++ -std=c++14 client.cpp -o client && ./client
 #include "library.hpp"
 #include <algorithm>
 #include <iostream>
+#include <thread>
+#include <future>
+
 using namespace std;
 
 class my_class_t {
@@ -22,6 +25,13 @@ int main() {
   commit(h);
 
   current(h)[0] = 42.5;
+
+  auto saving = async([document = current(h)]() {
+      this_thread::sleep_for(chrono::seconds(3));
+      cout << "-------- 'save' --------" << endl;
+      draw(document, cout, 0);
+  });
+
   current(h)[1] = string("World");
   current(h).emplace_back(current(h));
   current(h).emplace_back(my_class_t());
