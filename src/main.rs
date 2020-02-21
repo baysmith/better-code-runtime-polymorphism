@@ -1,31 +1,25 @@
 mod library;
 use crate::library::*;
-use std::io::Result;
-use std::io::Write;
 
-struct MyClass {}
+#[allow(dead_code)]
+struct Some {
+    member: Object,
+}
 
-impl Draw for MyClass {
-    fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
-        out.write(" ".repeat(position).as_bytes())?;
-        out.write(b"my_class_t\n")?;
-        Ok(())
+fn func() -> Some {
+    Some {
+        member: Object::new(5),
     }
 }
 
+#[allow(unused_assignments, unused_variables)]
 fn main() {
-    let stdout = std::io::stdout();
-    let mut out = stdout.lock();
+    /*
+        Quiz: what will this print?
+    */
+    let mut x = Some {
+        member: Object::new(0),
+    };
 
-    let mut document = Document::new();
-    document.reserve(5);
-
-    document.push(Object::new(0));
-    document.push(Object::new(1));
-    document.push(Object::new(2));
-    document.push(Object::new(3));
-
-    document.reverse();
-
-    document.draw(&mut out, 0).expect("draw document error");
+    x = func();
 }
