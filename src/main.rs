@@ -17,6 +17,9 @@ fn main() {
     let stdout = std::io::stdout();
     let mut out = stdout.lock();
     let mut document = Document::new();
-    document.push(MyClass {});
+    document.push(Object::new(0));
+    document.push(Object::new(1));
+    document.push(Object::new(2));
+    document.push(Object::new(3));
     document.draw(&mut out, 0).expect("draw document error");
 }
