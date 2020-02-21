@@ -4,8 +4,16 @@ use std::io::Write;
 
 pub trait Concept {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()>;
+    fn box_clone(&self) -> Box<dyn Concept>;
 }
 
+impl Clone for Box<dyn Concept> {
+    fn clone(&self) -> Box<dyn Concept> {
+        self.box_clone()
+    }
+}
+
+#[derive(Clone)]
 pub struct Object {
     value: Box<dyn Concept>,
 }
@@ -20,16 +28,23 @@ impl Concept for Object {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         self.value.draw(out, position)
     }
+    fn box_clone(&self) -> Box<dyn Concept> {
+        Box::new(self.clone())
+    }
 }
 
-impl<T: Display> Concept for T {
+impl<T: Display + Clone + 'static> Concept for T {
     default fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(format!("{}\n", self).as_bytes())?;
         Ok(())
     }
+    fn box_clone(&self) -> Box<dyn Concept> {
+        Box::new(self.clone())
+    }
 }
 
+#[derive(Clone)]
 pub struct Document {
     contents: Vec<Object>,
 }
@@ -58,5 +73,8 @@ impl Concept for Document {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(b"</document>\n")?;
         Ok(())
+    }
+    fn box_clone(&self) -> Box<dyn Concept> {
+        Box::new(self.clone())
     }
 }

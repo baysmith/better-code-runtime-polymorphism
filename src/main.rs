@@ -3,6 +3,7 @@ mod library;
 use crate::library::*;
 use std::fmt::{self, Display, Formatter};
 
+#[derive(Clone)]
 struct MyClass {}
 
 impl Display for MyClass {
@@ -20,7 +21,7 @@ fn main() {
 
     document.push(Object::new(0));
     document.push(Object::new("Hello!".to_string()));
-    document.push(Object::new(2));
+    document.push(Object::new(document.clone()));
     document.push(Object::new(MyClass {}));
 
     document.draw(&mut out, 0).expect("draw document error");
