@@ -2,6 +2,7 @@
 mod library;
 use crate::library::*;
 use std::fmt::{self, Display, Formatter};
+use std::io::Write;
 
 #[derive(Clone)]
 struct MyClass {}
@@ -16,13 +17,31 @@ fn main() {
     let stdout = std::io::stdout();
     let mut out = stdout.lock();
 
-    let mut document = Document::new();
-    document.reserve(5);
+    let mut h = History::new();
+    h.push(Document::new());
 
-    document.push(Object::new(0));
-    document.push(Object::new("Hello!".to_string()));
-    document.push(Object::new(document.clone()));
-    document.push(Object::new(MyClass {}));
+    current(&mut h).push(Object::new(0));
+    current(&mut h).push(Object::new("Hello!".to_string()));
 
-    document.draw(&mut out, 0).expect("draw document error");
+    current(&mut h).draw(&mut out, 0).expect("draw error");
+    out.write(b"--------------------------\n")
+        .expect("write error");
+
+    commit(&mut h);
+
+    current(&mut h)[0] = Object::new(42.5);
+    current(&mut h)[1] = Object::new("World".to_string());
+    // Must assign document copy to a variable to avoid multiple mutable borrow
+    // when in expression for push()
+    let doc = Object::new(current(&mut h).clone());
+    current(&mut h).push(doc);
+    current(&mut h).push(Object::new(MyClass {}));
+
+    current(&mut h).draw(&mut out, 0).expect("draw error");
+    out.write(b"--------------------------\n")
+        .expect("write error");
+
+    undo(&mut h);
+
+    current(&mut h).draw(&mut out, 0).expect("draw error");
 }

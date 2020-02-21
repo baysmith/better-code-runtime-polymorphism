@@ -1,6 +1,7 @@
 use std::fmt::Display;
 use std::io::Result;
 use std::io::Write;
+use std::ops::{Index, IndexMut};
 
 pub trait Concept {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()>;
@@ -9,6 +10,7 @@ pub trait Concept {
 
 impl Clone for Box<dyn Concept> {
     fn clone(&self) -> Box<dyn Concept> {
+        println!("copy");
         self.box_clone()
     }
 }
@@ -55,11 +57,26 @@ impl Document {
             contents: Vec::new(),
         }
     }
+    #[allow(dead_code)]
     pub fn reserve(&mut self, size: usize) {
         self.contents.reserve(size);
     }
     pub fn push(&mut self, item: Object) {
         self.contents.push(item);
+    }
+}
+
+impl Index<usize> for Document {
+    type Output = Object;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.contents[index]
+    }
+}
+
+impl IndexMut<usize> for Document {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.contents[index]
     }
 }
 
@@ -77,4 +94,22 @@ impl Concept for Document {
     fn box_clone(&self) -> Box<dyn Concept> {
         Box::new(self.clone())
     }
+}
+
+pub type History = Vec<Document>;
+
+pub fn commit(x: &mut History) {
+    assert!(x.len() > 0);
+    let last = x.last_mut().unwrap().clone();
+    x.push(last);
+}
+
+pub fn undo(x: &mut History) {
+    assert!(x.len() > 0);
+    x.pop();
+}
+
+pub fn current(x: &mut History) -> &mut Document {
+    assert!(x.len() > 0);
+    x.last_mut().unwrap()
 }
