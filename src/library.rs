@@ -6,12 +6,12 @@ pub trait Draw {
 }
 
 pub struct Object {
-    value: i32,
+    value: Box<i32>,
 }
 
 impl Object {
     pub fn new(x: i32) -> Self {
-        Object { value: x }
+        Object { value: Box::new(x) }
     }
 }
 
