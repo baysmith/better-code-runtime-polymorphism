@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::io::Result;
 use std::io::Write;
 
@@ -10,10 +11,7 @@ pub struct Object {
 }
 
 impl Object {
-    pub fn new_int(x: i32) -> Self {
-        Object { value: Box::new(x) }
-    }
-    pub fn new_string(x: String) -> Self {
+    pub fn new<T: Concept + 'static>(x: T) -> Self {
         Object { value: Box::new(x) }
     }
 }
@@ -24,29 +22,37 @@ impl Concept for Object {
     }
 }
 
-impl Concept for String {
-    fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
+impl<T: Display> Concept for T {
+    default fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(format!("{}\n", self).as_bytes())?;
         Ok(())
     }
 }
 
-impl Concept for i32 {
-    fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
-        out.write(" ".repeat(position).as_bytes())?;
-        out.write(format!("{}\n", self).as_bytes())?;
-        Ok(())
-    }
+pub struct Document {
+    contents: Vec<Object>,
 }
 
-pub type Document = Vec<Object>;
+impl Document {
+    pub fn new() -> Self {
+        Document {
+            contents: Vec::new(),
+        }
+    }
+    pub fn reserve(&mut self, size: usize) {
+        self.contents.reserve(size);
+    }
+    pub fn push(&mut self, item: Object) {
+        self.contents.push(item);
+    }
+}
 
 impl Concept for Document {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(b"<document>\n")?;
-        for e in self {
+        for e in &self.contents {
             e.draw(out, position + 2)?;
         }
         out.write(" ".repeat(position).as_bytes())?;
