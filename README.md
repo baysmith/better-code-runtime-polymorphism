@@ -5,6 +5,14 @@
 Git walk through of the C++ code presented in Sean Parent's talk [Better Code:
 Runtime Polymorphism][talk-slides].
 
+[rust-lang]: https://www.rust-lang.org/
+[rust-branch]: https://github.com/baysmith/better-code-runtime-polymorphism/tree/rust
+
+The [rust branch][rust-branch] contains a walk through the similar code implmented in
+[Rust][rust-lang]. Since Rust does not have inheritence and the [talk][talk-slides]
+suggests a goal of no inheritence, it is an interesting exercise to compare how similar
+runtime polymorphism is expressed in each language.
+
 Casual C++ programmers or CS undergrads will be familiar with the
 object-oriented code up to the "slide 13" commit. The use of the C++11 feature
 `std::shared_ptr` may be new and the memory leak fixed in "slide 13 (leak fix)"
