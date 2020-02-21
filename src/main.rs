@@ -1,25 +1,19 @@
 mod library;
 use crate::library::*;
 
-#[allow(dead_code)]
-struct Some {
-    member: Object,
-}
-
-fn func() -> Some {
-    Some {
-        member: Object::new(5),
-    }
-}
-
-#[allow(unused_assignments, unused_variables)]
 fn main() {
-    /*
-        Quiz: what will this print?
-    */
-    let mut x = Some {
-        member: Object::new(0),
-    };
+    let stdout = std::io::stdout();
+    let mut out = stdout.lock();
 
-    x = func();
+    let mut document = Document::new();
+    document.reserve(5);
+
+    document.push(Object::new_int(0));
+    document.push(Object::new_string("Hello!".to_string()));
+    document.push(Object::new_int(2));
+    document.push(Object::new_int(3));
+
+    document.reverse();
+
+    document.draw(&mut out, 0).expect("draw document error");
 }

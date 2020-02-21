@@ -1,28 +1,38 @@
 use std::io::Result;
 use std::io::Write;
 
-pub trait Draw {
+pub trait Concept {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()>;
 }
 
 pub struct Object {
-    value: Box<i32>,
+    value: Box<dyn Concept>,
 }
 
 impl Object {
-    pub fn new(x: i32) -> Self {
-        println!("ctor");
+    pub fn new_int(x: i32) -> Self {
+        Object { value: Box::new(x) }
+    }
+    pub fn new_string(x: String) -> Self {
         Object { value: Box::new(x) }
     }
 }
 
-impl Draw for Object {
+impl Concept for Object {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         self.value.draw(out, position)
     }
 }
 
-impl Draw for i32 {
+impl Concept for String {
+    fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
+        out.write(" ".repeat(position).as_bytes())?;
+        out.write(format!("{}\n", self).as_bytes())?;
+        Ok(())
+    }
+}
+
+impl Concept for i32 {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(format!("{}\n", self).as_bytes())?;
@@ -32,7 +42,7 @@ impl Draw for i32 {
 
 pub type Document = Vec<Object>;
 
-impl Draw for Document {
+impl Concept for Document {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(b"<document>\n")?;
