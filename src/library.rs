@@ -4,7 +4,7 @@ use std::io::Write;
 use std::ops::{Index, IndexMut};
 use std::sync::Arc;
 
-pub trait Concept {
+pub trait Concept: Send + Sync {
     fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()>;
 }
 
@@ -27,7 +27,7 @@ impl Concept for Object {
     }
 }
 
-impl<T: Display> Concept for T {
+impl<T: Display + Send + Sync> Concept for T {
     default fn draw(&self, out: &mut dyn Write, position: usize) -> Result<()> {
         out.write(" ".repeat(position).as_bytes())?;
         out.write(format!("{}\n", self).as_bytes())?;

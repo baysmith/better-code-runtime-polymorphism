@@ -3,6 +3,8 @@ mod library;
 use crate::library::*;
 use std::fmt::{self, Display, Formatter};
 use std::io::Write;
+use std::thread;
+use std::time;
 
 #[derive(Clone)]
 struct MyClass {}
@@ -30,6 +32,16 @@ fn main() {
     commit(&mut h);
 
     current(&mut h)[0] = Object::new(42.5);
+
+    let document = current(&mut h).clone();
+    let saving = thread::spawn(move || {
+        thread::sleep(time::Duration::from_secs(3));
+        let stdout = std::io::stdout();
+        let mut out = stdout.lock();
+        println!("-------- 'save' --------");
+        document.draw(&mut out, 0).expect("draw error");
+    });
+
     current(&mut h)[1] = Object::new("World".to_string());
     // Must assign document copy to a variable to avoid multiple mutable borrow
     // when in expression for push()
@@ -44,4 +56,7 @@ fn main() {
     undo(&mut h);
 
     current(&mut h).draw(&mut out, 0).expect("draw error");
+
+    drop(out);
+    saving.join().expect("join error");
 }
